@@ -10,6 +10,7 @@
             <v-text-field label="Bonus final (potion de prospection, etc.) (%)" type="number" v-model.number="potionBonus"/>
             <v-text-field label="Bonus donjon (bonus Stasis) (%)" type="number" v-model.number="dungeonBonus"/>
             <v-text-field label="Bonus serveur (%)" type="number" v-model.number="serverBonus"/>
+            <v-checkbox label="Booster" v-model="booster"/>
           </v-card-text>
         </v-card>
       </v-col>
@@ -57,11 +58,12 @@
     computed: {
       computedDropRate: function () {
         const baseRate = Math.round((100 + Math.min(200, this.prospection)) * toRate(this.serverBonus));
-        return Math.max(0, this.dropRate * baseRate / 100) * toRate(this.dungeonBonus) * toRate(this.potionBonus)
+        return Math.max(0, this.dropRate * baseRate / 100) * (this.booster ? 1.25 : 1) * toRate(this.dungeonBonus) * toRate(this.potionBonus)
       }
     },
 
     data: () => ({
+      booster: false,
       dropRate: 1.0,
       dungeonBonus: 0.0,
       potionBonus: 0.0,
