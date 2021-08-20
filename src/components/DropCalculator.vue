@@ -5,11 +5,11 @@
         <v-card>
           <v-card-title>Paramètres</v-card-title>
           <v-card-text>
-            <v-text-field label="Taux de drop (%)" v-model.number="dropRate"/>
-            <v-text-field label="Prospection (+ challenge)" v-model.number="prospection"/>
-            <v-text-field label="Bonus final (potion de prospection, etc.) (%)" v-model.number="potionBonus"/>
-            <v-text-field label="Bonus donjon (bonus Stasis) (%)" v-model.number="dungeonBonus"/>
-            <v-text-field label="Bonus serveur (%)" v-model.number="serverBonus"/>
+            <v-text-field label="Taux de drop (%)" type="number" v-model.number="dropRate"/>
+            <v-text-field label="Prospection (+ challenge)" type="number" v-model.number="prospection"/>
+            <v-text-field label="Bonus final (potion de prospection, etc.) (%)" type="number" v-model.number="potionBonus"/>
+            <v-text-field label="Bonus donjon (bonus Stasis) (%)" type="number" v-model.number="dungeonBonus"/>
+            <v-text-field label="Bonus serveur (%)" type="number" v-model.number="serverBonus"/>
           </v-card-text>
         </v-card>
       </v-col>
@@ -54,8 +54,14 @@
   export default {
     name: 'DropCalculator',
 
+    computed: {
+      computedDropRate: function () {
+        const baseRate = Math.round((100 + Math.min(200, this.prospection)) * toRate(this.serverBonus));
+        return Math.max(0, this.dropRate * baseRate / 100) * toRate(this.dungeonBonus) * toRate(this.potionBonus)
+      }
+    },
+
     data: () => ({
-      computedDropRate: 0,
       dropRate: 1.0,
       dungeonBonus: 0.0,
       potionBonus: 0.0,
@@ -66,40 +72,9 @@
     }),
 
     methods: {
-      compute() {
-        const baseRate = Math.round((100 + Math.min(200, this.prospection)) * toRate(this.serverBonus));
-        this.computedDropRate = Math.max(0, this.dropRate * baseRate / 100) * toRate(this.dungeonBonus) * toRate(this.potionBonus)
-      },
-
       toFixed(n, f) {
         // toString to remove useless 0
         return parseFloat(n).toFixed(f).replace(/\.*0+$/,'');
-      }
-    },
-
-    mounted() {
-      this.compute();
-    },
-
-    watch: {
-      dropRate: function () {
-        this.compute();
-      },
-
-      dungeonBonus: function () {
-        this.compute();
-      },
-
-      potionBonus: function () {
-        this.compute();
-      },
-
-      prospection: function () {
-        this.compute();
-      },
-
-      serverBonus: function () {
-        this.compute();
       }
     }
   }
